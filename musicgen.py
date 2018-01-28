@@ -4,12 +4,15 @@ from midiutil import MIDIFile
 
 def generate(filename):
     # generate
-    degrees  = generateNotes(0, random.randint(0, 127), random.randint(1, 500)) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
+    upper = random.randint(0, 128)
+    lower = random.randint(0, upper)
+
+    degrees  = generateNotes(lower, upper, random.randint(0, 501)) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
     track    = 0	# Literally, the track at which the notes are stored
     channel  = 0	# 1 = mono, 2 = stereo
     time     = 0    # When the note is played (the beat at which the note is played)
     duration = 1    # 1 = quarter note, 1/2 = eigth note
-    tempo    = random.randint(40, 200)   # In BPM
+    tempo    = random.randint(40, 201)   # In BPM
     volume   = 100  # 0-127, as per the MIDI standard
 
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created
@@ -17,9 +20,9 @@ def generate(filename):
     MyMIDI.addTempo(track, time, tempo)
 	# Idea: every iteration of the for loop, you randomly generate a new number
     for i, pitch in enumerate(degrees):
-        timeScalar = 1.0/random.randint(1, 9)     # This has to do with note position
-        durationScalar = 1.0/random.randint(1, 9) # This has to do with the notes duration (i.e. quarter note, half-note, etc.)
-        duration = random.randint(1,9)
+        timeScalar = 1.0/random.randint(1, 10)     # This has to do with note position
+        durationScalar = 1.0/random.randint(1, 10) # This has to do with the notes duration (i.e. quarter note, half-note, etc.)
+        duration = random.randint(1,10)
         MyMIDI.addNote(track, channel, pitch, i + timeScalar, duration * durationScalar, volume)# This is where we can configure the timing of each note
 
 	# If we want to add more notes to track 0 then we can do this:
