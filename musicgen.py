@@ -31,6 +31,7 @@ def generateNotes(lowerBound, upperBound, totalNotes):
 	retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
 	for i in retval:
 		i = random.randint(lowerBound, upperBound)
+		print (i)
 
 	return retval
 
