@@ -4,7 +4,7 @@ from midiutil import MIDIFile
 
 def generate(filename):
     # generate
-    degrees  = generateNotes(0, 60, 8) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
+    degrees  = generateNotes(1, 60, 8) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
     track    = 0	# Literally, the track at which the notes are stored
     channel  = 0	# 1 = mono, 2 = stereo
     time     = 0    # When the note is played (the beat at which the note is played)
@@ -31,7 +31,7 @@ def generateNotes(lowerBound, upperBound, totalNotes):
 	retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
 	for i in retval:
 		i = random.randint(lowerBound, upperBound)
-	
+
 	return retval
 
 def play(filename):
