@@ -23,7 +23,7 @@ def generate(filename):
         timeScalar = 1.0/random.randint(1, 10)     # This has to do with note position
         durationScalar = 1.0/random.randint(1, 10) # This has to do with the notes duration (i.e. quarter note, half-note, etc.)
         duration = random.randint(1,10)
-        MyMIDI.addNote(track, channel, pitch, i + timeScalar, duration * durationScalar, volume)# This is where we can configure the timing of each note
+        MyMIDI.addNote(track, channel, pitch, i + timeScalar, 1, volume)# This is where we can configure the timing of each note
 
 	# If we want to add more notes to track 0 then we can do this:
 	# MyMIDI.addNote(track, channel, 60, time + 7, duration*0.5, volume-10)
