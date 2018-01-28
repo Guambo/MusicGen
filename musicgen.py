@@ -18,7 +18,7 @@ def generate(filename):
 	# Idea: every iteration of the for loop, you randomly generate a new number
     for i, pitch in enumerate(degrees):
         MyMIDI.addNote(track, channel, pitch, time + i*0.5, duration * 1/2, volume) # This is where we can configure the timing of each note
-
+		print (pitch)
 	# If we want to add more notes to track 0 then we can do this:
 	# MyMIDI.addNote(track, channel, 60, time + 7, duration*0.5, volume-10)
 
@@ -31,7 +31,7 @@ def generateNotes(lowerBound, upperBound, totalNotes):
 	retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
 	for i in retval:
 		i = random.randint(lowerBound, upperBound)
-		print (i)
+		# print (i)
 
 	return retval
 
