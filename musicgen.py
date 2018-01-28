@@ -1,13 +1,14 @@
 import argparse
+import random
 from midiutil import MIDIFile
 
 def generate(filename):
     # generate
-    degrees  = [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
-    track    = 0
-    channel  = 0
-    time     = 0    # In beats
-    duration = 1    # In beats
+    degrees  = generateNotes # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
+    track    = 0	# Literally, the track at which the notes are stored
+    channel  = 0	# I don't know yet
+    time     = 0    # When the note is played (the beat at which the note is played)
+    duration = 1    # 1 = quarter note, 1/2 = eigth note
     tempo    = 60   # In BPM
     volume   = 100  # 0-127, as per the MIDI standard
 
@@ -16,11 +17,17 @@ def generate(filename):
     MyMIDI.addTempo(track, time, tempo)
 
     for i, pitch in enumerate(degrees):
-        MyMIDI.addNote(track, channel, pitch, time + i, duration, volume)
+        MyMIDI.addNote(track, channel, pitch, time + i, duration * 1/2, volume) # This is where we can configure the timing of each note
+
+	# If we want to add more notes to track 0 then we can do this:
+	# MyMIDI.addNote(track, channel, 60, time + 7, duration*0.5, volume-10)
 
     with open(filename, "wb") as output_file:
         MyMIDI.writeFile(output_file)
 
+# This function will generate a random sequence of notes (midi notes) and will return an array of random notes given certain constraints
+def generateNotes(lowerBound, upperBound)
+	retval = [60, 62, 64, 65, 67, 69, 71, 72]
 
 def play(filename):
     # play file
