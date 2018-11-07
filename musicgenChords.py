@@ -7,41 +7,43 @@ def generate(filename):
     # generate
     Key = random.randint(0,11)
 
-    upper = random.randint(0, 128)
-    lower = random.randint(0, upper)
+    upper = 6
+    lower = 5
+    Mchords = generateChords()
 
+    #degrees  = generateNotes(lower, upper, random.randint(0, 501), Key) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
 
-
-    degrees  = generateNotes(lower, upper, random.randint(0, 501), Key) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
     track    = 0	# Literally, the track at which the notes are stored
     channel  = 0	# 1 = mono, 2 = stereo
     time     = 0    # When the note is played (the beat at which the note is played)
     duration = 1    # 1 = quarter note, 1/2 = eigth note
-    tempo    = random.randint(40, 201)   # In BPM
+    tempo    = random.randint(80, 160)   # In BPM
     volume   = 100  # 0-127, as per the MIDI standard
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created automatically)
 
     MyMIDI.addTempo(track, time, tempo)
 	# Idea: every iteration of the for loop, you randomly generate a new number
-    for i, pitch in enumerate(degrees):
-        timeScalar = 1.0/random.randint(1, 10)     # This has to do with note time position
-        durationScalar = 1.0/random.randint(1, 10) # This has to do with the notes duration (i.e. quarter note, half-note, etc.)
-        duration = random.randint(1,10)
-        MyMIDI.addNote(track, channel, pitch, i + timeScalar, duration * durationScalar, volume)# This is where we can configure the timing of each note
-
+    for j in range(0,len(Mchords),1):
+        cDegrees = generateCNotes(lower, upper, 8, Key, Mchords[j])
+        baseNote = generateSNotes(3, 4, 8, Key, Mchords[j], 0)
+        sDegrees = generateSNotes(3, 4, 8, Key, Mchords[j], 0)
+        noteAdder(track, channel, j, 1, volume, cDegrees, MyMIDI)
+        noteAdder(track, channel, j, 1, volume, baseNote, MyMIDI)
 	# If we want to add more notes to track 0 then we can do this:
 	# MyMIDI.addNote(track, channel, 60, time + 7, duration*0.5, volume-10)
 
     with open(filename, "wb") as output_file:
         MyMIDI.writeFile(output_file)
-
 # This function will generate a random sequence of notes (midi notes) and will return an array of random notes given certain constraints
+def noteAdder(track, channel, j, duration, volume, notes, midi):
+    for i, pitch in enumerate(notes):
+        midi.addNote(track, channel, pitch, i+(j*8), duration, volume)# This is where we can configure the timing of each notev
 def generateChords():
-    Chordamt = random.randint(2,9)#Number of Chords In Chord Pogressio
-    chordlist = Chords #list of chords in Key
+    Chordamt = random.randint(2,4)#Number of Chords In Chord Pogressio
+    chordlist = Chords() #list of chords in Key
     retval = [0]*Chordamt
     for i in range(0,Chordamt,1):
-        whichChord = random.randint(0,len(chordlist))
+        whichChord = random.randint(0,len(chordlist)-1)
         retval[i] = chordlist[whichChord]
         print(retval[i])
     return retval
@@ -56,14 +58,22 @@ def Chords():
     six = [9, 0, 4]
     seven = [11, 2, 5]
     return [one,two,three,majthree,four,minfour,five,six,seven]
-def generateNotes(lowerBound, upperBound, totalNotes, key):
-	#retval = [60, 62, 64, 65, 67, 69, 71, 72]
-	retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
-	for i in range(len(retval)):
-		retval[i] = random.randint(lowerBound, upperBound)
-		# print (i)
+    #return [one,two,three,four,five,six]
+def generateSNotes(lowerBound, upperBound, totalNotes, key, chord, degree):
+#retval = [60, 62, 64, 65, 67, 69, 71, 72]
+    retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
+    for i in range(len(retval)):
+        retval[i] = chord[degree]+12*random.randint(lowerBound, upperBound) + key
 
-	return retval
+    return retval
+def generateCNotes(lowerBound, upperBound, totalNotes, key, chord):
+#retval = [60, 62, 64, 65, 67, 69, 71, 72]
+    retval = [0] * totalNotes # Randomly instantiates an array of size totalNotes
+    for i in range(len(retval)):
+        degree = random.randint(0,2)
+        retval[i] = chord[degree]+12*random.randint(lowerBound, upperBound) + key
+
+    return retval
 
 def play(filename):
     # play file
