@@ -9,7 +9,7 @@ def generate(filename):
     print(notetoString(Key))
     upper = 5
     lower = 5
-    length = 8
+    length = random.randint(2,16)
     Mchords = generateChords()
     #degrees  = generateNotes(lower, upper, random.randint(0, 501), Key) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
 
@@ -21,16 +21,21 @@ def generate(filename):
     volume   = 100  # 0-127, as per the MIDI standard
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created automatically)
     MyMIDI.addTempo(track, time, tempo)
-    baseRhythm = rhythm(length)
+    baseRhythm = rhythm(length,100)
+    cRhythm = rhythm(length,50)
+    obRhythm = rhythm(length,25)
+    c2Rhythm = rhythm(length,50)
 	# Idea: every iteration of the for loop, you randomly generate a new number
     for j in range(0,len(Mchords),1):
         cDegrees = generateCNotes(lower, upper, length, Key, Mchords[j])
-        c2Degrees = generateCNotes(lower+1, upper+1, length, Key, Mchords[j])
+        offbeat = generateCNotes(lower, upper, length, Key, Mchords[j])
+        cDegrees2 = generateCNotes(lower+1, upper+1, length, Key, Mchords[j])
         #oDegrees = generateCNotes(lower, upper, length, Key, Mchords[j])
-        baseNote = generateCNotes(2, 2, length, Key, Mchords[j])
+        baseNote = generateCNotes(lower-2, upper-1, length, Key, Mchords[j])
         #leadingtone = generateSNotes(3, 3, length, Key, Mchords[j], 2)
-        noteAdderR(track, channel, j, 2, volume, cDegrees, MyMIDI, length,rhythm(length))
-        noteAdderR(track, channel, j, 2, volume, c2Degrees, MyMIDI, length,rhythm(length))
+        noteAdderR(track, channel, j, 2, volume, cDegrees, MyMIDI, length,cRhythm)
+        #noteAdderR(track, channel, j, 2, volume, offbeat, MyMIDI, length,offbeat)
+        noteAdderR(track, channel, j, 2, volume, cDegrees2, MyMIDI, length,c2Rhythm)
         noteAdderR(track, channel, j, 2, volume, baseNote, MyMIDI, length, baseRhythm)
         #noteAdderR(track, channel, j, 1, volume, leadingtone, MyMIDI, length, chordrandR)
 	# If we want to add more notes to track 0 then we can do this:
@@ -40,13 +45,13 @@ def generate(filename):
 # This function will generate a random sequence of notes (midi notes) and will return an array of random notes given certain constraints
 def noteAdder(track, channel, j, duration, volume, notes, midi, chordlength):
     for i, pitch in enumerate(notes):
-        midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)# This is where we can configure the timing of each notev
-def noteAdderR(track, channel, j, duration, volume, notes, midi, chordlength, rhy):
+        midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)# adds the notes to the MIDI
+def noteAdderR(track, channel, j, duration, volume, notes, midi, chordlength, rhy):#parameters used are the (MIDI track, channel, the duration of the note,
     for i, pitch in enumerate(notes):
         if(rhy[i]  > 0):
-            midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)# This is where we can configure the timing of each notev
+            midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)#adds the notes to the MIDI if the rhythm list says it can
 def generateChords():
-    Chordamt = random.randint(2,4)#Number of Chords In Chord Pogressio
+    Chordamt = random.randint(3,5)#Number of Chords In Chord Pogressio
     chordlist = Chords() #list of chords in Key
     retval = [0]*Chordamt
     for i in range(0,Chordamt,1):
@@ -54,10 +59,12 @@ def generateChords():
         retval[i] = chordlist[whichChord]
         print(retval[i])
     return retval
-def rhythm(length):#generates a list of size of the given length parameter with random numbers from 0 or 1
+def rhythm(length, percent):#generates a list of size of the given length parameter with random numbers from 0 or 1, with the percentage being the liklyhood of it containing more 1's
     retval = [0] * length
     for i in range(len(retval)):
-        retval[i] = random.randint(0,1)
+        if(random.random()*100<percent):
+            retval[i] = 1
+
     return retval
 def notetoString(note):#converts a note integer to the letter not it represents
     bNote = note%12
@@ -86,7 +93,7 @@ def notetoString(note):#converts a note integer to the letter not it represents
     if(note == 11):
         return "B"
 def Chords():#defines chords to be used is randomized track
-    one = [0, 4, 7, 11]
+    one = [0, 4, 7]
     two = [2, 5, 9]
     three = [4, 7, 11]
     majthree = [4, 8, 11]
@@ -117,7 +124,7 @@ def play(filename):
     # play file
     print("playing file " + filename + "\n")
 
-def main():
+def main():#this main method uses a PATH variable to write the midi to
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-o", "--generate", dest = "path", help = "generate a MIDI file and write it out to PATH")
@@ -130,9 +137,9 @@ def main():
         generate(str(args.path))
     else:
         print("Bad command line arguments or none specified. Use the flag -h or --help to see a list of available flags to use with MusicGen.")
-    main2()
-def main2():
-    save_path = 'D:/GithubRepos/MusicGen/'
+def main2():#this main method defaults to using the current folder the script is currently in to store the MIDI file
+    save_path = os.path.dirname(__file__)
     fileName = os.path.join(save_path, "test.mid")
     generate(fileName)
+
 main2()
