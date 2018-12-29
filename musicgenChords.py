@@ -9,8 +9,8 @@ def generate(filename):
     print(notetoString(Key))
     upper = 5
     lower = 5
-    length = random.randint(2,16)
-    Mchords = generateChords()
+    length = random.randint(2,10)
+    Mchords = generateChords(seventhChords())
     #degrees  = generateNotes(lower, upper, random.randint(0, 501), Key) # This is where the actual notes are stored ... ex: [60, 62, 64, 65, 67, 69, 71, 72]  # MIDI note number
 
     track    = 0	# Literally, the track at which the notes are stored
@@ -21,22 +21,22 @@ def generate(filename):
     volume   = 100  # 0-127, as per the MIDI standard
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created automatically)
     MyMIDI.addTempo(track, time, tempo)
-    baseRhythm = rhythm(length,100)
+    baseRhythm = rhythm(length,90)
     cRhythm = rhythm(length,50)
-    obRhythm = rhythm(length,25)
+    obRhythm = rhythm(length,10)
     c2Rhythm = rhythm(length,50)
 	# Idea: every iteration of the for loop, you randomly generate a new number
     for j in range(0,len(Mchords),1):
-        cDegrees = generateCNotes(lower, upper, length, Key, Mchords[j])
-        offbeat = generateCNotes(lower, upper, length, Key, Mchords[j])
-        cDegrees2 = generateCNotes(lower+1, upper+1, length, Key, Mchords[j])
-        #oDegrees = generateCNotes(lower, upper, length, Key, Mchords[j])
-        baseNote = generateCNotes(lower-2, upper-1, length, Key, Mchords[j])
+        cDegrees = generateCNotes(lower, upper, length, Key, Mchords[j])# generates treble on-beat notes
+        offbeat = generateCNotes(lower, upper, length, Key, Mchords[j])#generates off beat notes, which are less frequent
+        cDegrees2 = generateCNotes(lower+1, upper+1, length, Key, Mchords[j])# generates treble on-beat notes an octave up
+        oDegrees = generateCNotes(lower, upper, length*2, Key, Mchords[j])# generates treble on-beat notes with more length
+        baseNote = generateCNotes(lower-2, upper-1, length, Key, Mchords[j])#defines bass notes for entire song
         #leadingtone = generateSNotes(3, 3, length, Key, Mchords[j], 2)
-        noteAdderR(track, channel, j, 2, volume, cDegrees, MyMIDI, length,cRhythm)
-        #noteAdderR(track, channel, j, 2, volume, offbeat, MyMIDI, length,offbeat)
-        noteAdderR(track, channel, j, 2, volume, cDegrees2, MyMIDI, length,c2Rhythm)
-        noteAdderR(track, channel, j, 2, volume, baseNote, MyMIDI, length, baseRhythm)
+        noteAdderR(track, channel, j, 2, volume, cDegrees, MyMIDI, length, cRhythm, 0)
+        noteAdderR(track, channel, j, 2, volume, offbeat, MyMIDI, length, offbeat, 0.5)
+        #noteAdderR(track, channel, j, 2, volume, cDegrees2, MyMIDI, length,c2Rhythm, 0)
+        noteAdderR(track, channel, j, 2, volume, baseNote, MyMIDI, length, baseRhythm, 0)
         #noteAdderR(track, channel, j, 1, volume, leadingtone, MyMIDI, length, chordrandR)
 	# If we want to add more notes to track 0 then we can do this:
 	# MyMIDI.addNote(track, channel, 60, time + 7, duration*0.5, volume-10)
@@ -46,13 +46,13 @@ def generate(filename):
 def noteAdder(track, channel, j, duration, volume, notes, midi, chordlength):
     for i, pitch in enumerate(notes):
         midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)# adds the notes to the MIDI
-def noteAdderR(track, channel, j, duration, volume, notes, midi, chordlength, rhy):#parameters used are the (MIDI track, channel, the duration of the note,
+def noteAdderR(track, channel, j, duration, volume, notes, midi, chordlength, rhy, beatchange):#parameters used are the (MIDI track, channel, the duration of the note, volume, list of the notes added, MIDIfile, the number of beats with the duration of the chord, the rhythm list, the beat additive modifier
     for i, pitch in enumerate(notes):
         if(rhy[i]  > 0):
-            midi.addNote(track, channel, pitch, i+(j*chordlength), duration, volume)#adds the notes to the MIDI if the rhythm list says it can
-def generateChords():
-    Chordamt = random.randint(3,5)#Number of Chords In Chord Pogressio
-    chordlist = Chords() #list of chords in Key
+            midi.addNote(track, channel, pitch, beatchange + i +(j*chordlength), duration, volume)#adds the notes to the MIDI if the rhythm list says it can
+def generateChords(chords):
+    Chordamt = random.randint(10,11)#Number of Chords In Chord Pogressio
+    chordlist = chords #list of chords in Key
     retval = [0]*Chordamt
     for i in range(0,Chordamt,1):
         whichChord = random.randint(0,len(chordlist)-1)
@@ -102,7 +102,14 @@ def Chords():#defines chords to be used is randomized track
     five = [7, 11, 2]
     six = [9, 0, 4]
     seven = [11, 2, 5]
-    #return [one,two,three,majthree,four,minfour,five,six,seven]
+    return [one,two,three,majthree,four,minfour,five,six,seven]
+def seventhChords():
+    one = [0, 4, 7, 11]
+    two = [2, 5, 9, 0]
+    three = [4, 7, 11, 2]
+    four = [5, 9, 0, 4]
+    five = [7, 11, 2, 6]
+    six = [9, 0, 4, 7]
     return [one,two,three,four,five,six]
 def generateSNotes(lowerBound, upperBound, totalNotes, key, chord, degree):#generates array of a single note degree within chord
 #retval = [60,60,48,72,60]
