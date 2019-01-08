@@ -1,6 +1,7 @@
 import argparse
 import random
 from midiutil import MIDIFile
+from pathlib import Path
 import os.path
 
 def generate(filename):
@@ -53,15 +54,19 @@ def main():
 
     args = parser.parse_args()
 
+    save_path = Path().absolute()
+
     if(type(args.path) is str):
         generate(args.path)
     elif(type(args.path) is int):
         generate(str(args.path))
     else:
-        print("Bad command line arguments or none specified. Use the flag -h or --help to see a list of available flags to use with MusicGen.")
-    main2()
-def main2():
-    save_path = 'D:/GithubRepos/MusicGen/'
-    fileName = os.path.join(save_path, "test.mid")
-    generate(fileName)
-main2()
+        fileName = os.path.join(save_path, "test.mid");
+        generate(fileName)
+        # print("Bad command line arguments or none specified. Use the flag -h or --help to see a list of available flags to use with MusicGen.")
+main()
+
+# def main2():
+#    save_path = '~/MusicGen/saves'
+#    fileName = os.path.join(save_path, "test.mid")
+#    generate(fileName)
